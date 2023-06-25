@@ -1,16 +1,16 @@
 # cjlu_managementsys
 
-This template should help get you started developing with Vue 3 in Vite.
+A management system by Vue3 + pinia + vite
 
-## Recommended IDE Setup
+## Recommended IDE Setup(推荐运行环境)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [Javascript].
 
 ## Customize configuration
 
 See [Vite Configuration Reference](https://vitejs.dev/config/).
 
-## Project Setup
+## Project Setup(初始化项目)
 
 ```sh
 npm install
