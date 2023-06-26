@@ -3,7 +3,7 @@
     <template #header="titleId">
       <h2 :id="titleId">Add a student</h2>
     </template>
-    <el-form :ref=this.stuForm :rules="rules" :model="stuForm" label-width="120px" label-position="left">
+    <el-form ref="stuForm" :rules="rules" :model="stuForm" label-width="120px" label-position="left">
       <el-form-item label="Number:" prop="stunum">
         <el-input v-model="stuForm.stunum" clearable />
       </el-form-item>
@@ -26,7 +26,7 @@
         <el-input v-model="stuForm.stuidentification" clearable />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitStuForm(this.stuForm)">Create</el-button>
+        <el-button type="primary" @click="submitStuForm()">Create</el-button>
         <el-button @click="dialogFormVisible = false;">Cancel</el-button>
       </el-form-item>
     </el-form>
@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import { reactive, ref } from 'vue'
-const ruleFormRef = ref()
+import { ref } from 'vue'
 
 export default {
   props: {
@@ -78,15 +77,14 @@ export default {
     }
   },
   methods: {
-    async submitStuForm (formEl) {
-      if (!formEl)
-        return
-      await formEl.validate((valid, fields) => {
-        if (valid)
-          console.log('Submit!')
-        else
-          console.log('Submit failed', fields)
-      })
+    submitStuForm () {
+      this.$refs.stuForm.validate(valid => {
+        if (valid) {
+          alert("submit!");
+        } else {
+          return false;
+        }
+      });
     }
   },
   watch: {

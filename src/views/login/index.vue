@@ -32,7 +32,6 @@ export default {
   setup () {
     const store = useUserStore()
     let { token, username, role } = storeToRefs(store) //方法3：可以利用从pinia中引用的storeToRefs方法，进行解构赋值 再return出去 类似 vue3 中的 toRefs
-    console.log(store)
     return {
       // store, //方法1：可以把整个store return出去
       // baseUrl: computed(() => store.baseUrl),  //方法2：可以利用computed属性，将需要展示的值return出去
