@@ -1,4 +1,5 @@
 <template>
+  <Header></Header>
   <div class="table-wrapper">
     <el-table max-height="550" v-loading="loading" id="studiv" element-loading-text="Loading..." :border="true"
       :default-sort="{ prop: 'stunum', order: 'ascending' }" :data="currentTableData" stripe style="width: 100%;">
@@ -26,6 +27,7 @@
 
 <script>
 import { getStuList } from '@/api/stu'
+import Header from './components/StudentHeader.vue';
 
 
 export default {
@@ -41,6 +43,7 @@ export default {
     }
   },
   components: {
+    Header,
   },
   created () {
     this.loading = true
