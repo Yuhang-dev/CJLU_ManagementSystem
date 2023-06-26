@@ -38,7 +38,7 @@ export default {
   },
   data () {
     return {
-      dialogFormVisible: true,
+      dialogFormVisible: false,
       stuForm: {
         stunum: '',
         stuname: '',
