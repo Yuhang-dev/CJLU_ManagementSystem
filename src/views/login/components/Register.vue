@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :before-close="resetForm" v-model="visible" title="Sign In">
+  <el-dialog :before-close="resetForm(ruleFormRef)" v-model="visible" title="Sign In">
     <el-form :rules="rules" ref="ruleFormRef" :model="registerForm" label-position="left">
       <el-form-item prop="name" label="User name" :label-width="formLabelWidth">
         <el-input v-model="registerForm.name" autocomplete="off" clearable />
@@ -19,8 +19,7 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="visible = false; $emit('closedialog');
-        resetForm(ruleFormRef)">
+        <el-button @click="visible = false; resetForm(ruleFormRef)">
           Cancel
         </el-button>
         <el-button type="primary" @click="submitForm(ruleFormRef);">
@@ -36,12 +35,11 @@ import { reactive, ref, watch, toRefs } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 
 const ruleFormRef = ref<FormInstance>()
-
+const props = defineProps(['showForm'])
+const { showForm } = toRefs(props)
 const emit = defineEmits(['closedialog'])
-const props = defineProps({ showForm: Boolean });
-let { showForm } = toRefs(props)
-let visible = ref<Boolean>(false);
-let formLabelWidth = ref('140px');
+const visible = ref<Boolean>(false);
+const formLabelWidth = ref('140px');
 const registerForm = reactive({
   name: '',
   password: '',
@@ -71,18 +69,20 @@ const validatePass2 = (rule: any, value: any, callback: any) => {
 }
 
 watch(showForm, () => {
-  visible = showForm;
+  visible.value = showForm.value
 });
 
 watch(visible, () => {
-  emit('closedialog', visible);
+  emit('closedialog', visible.value)
 });
 
 const rules = reactive<FormRules<typeof registerForm>>({
   name: [{ required: true, message: 'Please input Activity name', trigger: 'blur' },
   { min: 2, max: 20, message: 'Length should be 2 to 20', trigger: 'blur' }],
-  password: [{ validator: validatePass, trigger: 'blur' }],
-  checkpassword: [{ validator: validatePass2, trigger: 'blur' }],
+  password: [{ required: true, validator: validatePass, trigger: 'blur' },
+  { min: 6, max: 12, message: 'Password should be 6 to 20', trigger: 'blur' }],
+  checkpassword: [{ required: true, validator: validatePass2, trigger: 'blur' },
+  { min: 6, max: 12, message: 'Password should be 6 to 20', trigger: 'blur' }],
   role: [{ required: true, message: 'Please select at least one sex', trigger: 'change', }]
 })
 
