@@ -12,3 +12,15 @@ export function getStuList () {
     method: 'get'
   });
 }
+
+/**
+ * 具体学生查询
+ *
+ * @param 
+ */
+export function queryOneStu (param) {
+  return request({
+    url: '/student/queryOneStu',
+    method: 'get'
+  });
+}

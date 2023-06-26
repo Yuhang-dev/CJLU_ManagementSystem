@@ -7,7 +7,7 @@
       <el-aside style="position:fixed;width: var(--aside-width);">
         <Sidebar></Sidebar>
       </el-aside>
-      <el-main class="my-pagecontent"><router-view /></el-main>
+      <el-container class="my-pagecontent"><router-view /></el-container>
     </el-container>
     <div v-if="showSearchWindow" @click="eventHandle('mask')" class="searchwindow">
       <div @click.stop="eventHandle('modal')" class="search-modal">
@@ -99,7 +99,9 @@ export default {
 </script>
 <style scoped>
 .my-pagecontent {
+  display: flex;
   padding-left: calc(var(--aside-width) + 10px);
+  flex-direction: column;
 }
 
 .searchwindow {

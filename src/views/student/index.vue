@@ -1,5 +1,7 @@
 <template>
-  <Header></Header>
+  <div style="margin: 5px 0 5px 0;">
+    <Header @newStudent="this.addNewStu = true;"></Header>
+  </div>
   <div class="table-wrapper">
     <el-table max-height="550" v-loading="loading" id="studiv" element-loading-text="Loading..." :border="true"
       :default-sort="{ prop: 'stunum', order: 'ascending' }" :data="currentTableData" stripe style="width: 100%;">
@@ -23,16 +25,19 @@
       :pager-count="pageCount" layout="sizes, prev, pager, next, jumper" :total="totalRecords"
       style="justify-content: center;margin-top: 10px;" />
   </div>
+  <StuAdd @changeVisible="(e) => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
 </template>
 
 <script>
 import { getStuList } from '@/api/stu'
 import Header from './components/StudentHeader.vue';
+import StuAdd from './components/StudentAdd.vue';
 
 
 export default {
   data () {
     return {
+      addNewStu: false,
       currentPage: 1,
       pageSize: 10,
       pageCount: 11,
@@ -44,6 +49,7 @@ export default {
   },
   components: {
     Header,
+    StuAdd
   },
   created () {
     this.loading = true
@@ -146,7 +152,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-
+  margin-top: 5px;
 }
 
 .cancel-button {

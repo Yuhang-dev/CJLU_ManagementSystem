@@ -141,7 +141,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-
+  margin-top: 5px;
 }
 
 .cancel-button {
