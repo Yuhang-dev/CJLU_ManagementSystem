@@ -25,7 +25,7 @@
       :pager-count="pageCount" layout="sizes, prev, pager, next, jumper" :total="totalRecords"
       style="justify-content: center;margin-top: 10px;" />
   </div>
-  <StuAdd @changeVisible="(e) => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
+  <StuAdd @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
 </template>
 
 <script>

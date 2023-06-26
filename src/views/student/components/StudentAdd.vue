@@ -1,30 +1,32 @@
 <template>
-  <el-dialog v-model="dialogFormVisible">
-    <h2>Add a Student</h2>
-    <el-form v-model="stuForm" label-width="120px">
-      <el-form-item label="Number:">
-        <el-input v-model="stuForm.stunum" />
+  <el-dialog draggable="true" v-model="dialogFormVisible">
+    <template #header="titleId">
+      <h2 :id="titleId">Add a student</h2>
+    </template>
+    <el-form :ref=this.stuForm :rules="rules" :model="stuForm" label-width="120px" label-position="left">
+      <el-form-item label="Number:" prop="stunum">
+        <el-input v-model="stuForm.stunum" clearable />
       </el-form-item>
-      <el-form-item label="Name:">
-        <el-input v-model="stuForm.stuname" />
+      <el-form-item label="Name:" prop="stuname">
+        <el-input v-model="stuForm.stuname" clearable />
       </el-form-item>
-      <el-form-item label="Birthday:">
+      <el-form-item label="Birthday:" prop="stubirth">
         <el-date-picker v-model="stuForm.stubirth" type="date" placeholder="Pick a day" />
       </el-form-item>
-      <el-form-item label="Sex:">
+      <el-form-item label="Sex:" prop="stusex">
         <el-radio-group v-model="stuForm.stusex">
           <el-radio label="1">Man</el-radio>
           <el-radio label="0">Woman</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="Department:">
-        <el-input v-model="stuForm.studep" />
+      <el-form-item label="Department:" prop="studep">
+        <el-input v-model="stuForm.studep" clearable />
       </el-form-item>
-      <el-form-item label="Identification:">
-        <el-input v-model="stuForm.stuidentification" />
+      <el-form-item label="Identification:" prop="stuidentification">
+        <el-input v-model="stuForm.stuidentification" clearable />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="">Create</el-button>
+        <el-button type="primary" @click="submitStuForm(this.stuForm)">Create</el-button>
         <el-button @click="dialogFormVisible = false;">Cancel</el-button>
       </el-form-item>
     </el-form>
@@ -32,6 +34,9 @@
 </template>
 
 <script>
+import { reactive, ref } from 'vue'
+const ruleFormRef = ref()
+
 export default {
   props: {
     showForm: Boolean,
@@ -47,6 +52,41 @@ export default {
         studep: '',
         stuidentification: '',
       },
+      rules: {
+        stunum: [
+          { required: true, message: 'Please input Activity name', trigger: 'blur' },
+          { min: 1, max: 7, message: 'Length should be 1 to 7', trigger: 'blur' },
+        ],
+        stuname: [
+          { required: true, message: 'Please input Activity name', trigger: 'blur' },
+          { min: 2, max: 20, message: 'Length should be 2 to 20', trigger: 'blur' },
+        ],
+        stubirth: [
+          { required: true, message: 'Please select a date', trigger: 'blur', },
+        ],
+        stusex: [
+          { required: true, message: 'Please select at least one sex', trigger: 'change', },
+        ],
+        studep: [
+          { required: true, message: 'Please input a dep', trigger: 'blur', },
+        ],
+        stuidentification: [
+          { required: true, message: 'Please input a identification', trigger: 'blur' },
+          { min: 13, max: 13, message: 'Input the valid identification,(13char)', trigger: 'blur' },
+        ],
+      },
+    }
+  },
+  methods: {
+    async submitStuForm (formEl) {
+      if (!formEl)
+        return
+      await formEl.validate((valid, fields) => {
+        if (valid)
+          console.log('Submit!')
+        else
+          console.log('Submit failed', fields)
+      })
     }
   },
   watch: {

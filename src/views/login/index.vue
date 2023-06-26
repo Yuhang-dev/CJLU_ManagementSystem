@@ -14,43 +14,21 @@
       <div style="display: flex;">
         <el-button type="primary" @click="handleLogin()" plain>Login</el-button>
         <el-button type="primary" @click="dialogFormVisible = true" plain>Register</el-button>
-        <el-dialog v-model="dialogFormVisible" title="Sign In">
-          <el-form :model="registerForm">
-            <el-form-item label="User name" :label-width="formLabelWidth">
-              <el-input v-model="registerForm.name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Password" :label-width="formLabelWidth">
-              <el-input v-model="registerForm.password" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Role" :label-width="formLabelWidth">
-              <el-select v-model="registerForm.role" placeholder="Please select a role">
-                <el-option label="Normal user" value="user" />
-                <el-option label="Super admin" value="admin" disabled />
-              </el-select>
-            </el-form-item>
-          </el-form>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="dialogFormVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="dialogFormVisible = false">
-                Confirm
-              </el-button>
-            </span>
-          </template>
-        </el-dialog>
       </div>
     </div>
     <div class="side-background"></div>
   </div>
+  <RegisterView @closedialog="e => this.dialogFormVisible = e" :showForm="this.dialogFormVisible"></RegisterView>
 </template>
 
 <script>
 import axios from 'axios';
-import { useUserStore } from '../../store/modules/user';
+import { useUserStore } from '@/store/modules/user';
 import { storeToRefs } from "pinia";
-
+import RegisterView from './components/register.vue';
 
 export default {
+
   setup () {
     const store = useUserStore()
     let { token, username, role } = storeToRefs(store) //方法3：可以利用从pinia中引用的storeToRefs方法，进行解构赋值 再return出去 类似 vue3 中的 toRefs
@@ -71,13 +49,10 @@ export default {
         username: '',
         password: '',
       },
-      registerForm: {
-        name: '',
-        password: '',
-        role: '',
-      },
-      formLabelWidth: '140px',
     }
+  },
+  components: {
+    RegisterView,
   },
   methods: {
     test () {
@@ -222,9 +197,5 @@ export default {
 
 .el-input {
   width: 300px;
-}
-
-.dialog-footer button:first-child {
-  margin-right: 10px;
 }
 </style>
