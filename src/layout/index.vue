@@ -20,15 +20,21 @@
                   stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
                 </path>
               </svg></label>
-            <input class="search-input" id="docsearch-input" enterkeyhint="go" spellcheck="false" autofocus="true"
-              placeholder="Search Function" maxlength="64" type="search">
-            <button type="reset" class="search-button"><svg width="20" height="20" viewBox="0 0 20 20">
-                <path d="M10 10l5.09-5.09L10 10l5.09 5.09L10 10zm0 0L4.91 4.91 10 10l-5.09 5.09L10 10z"
-                  stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-                </path>
-              </svg></button>
+            <input v-model="searchValue" class="search-input" id="docsearch-input" enterkeyhint="go" spellcheck="false"
+              autofocus="true" placeholder="Search Function" maxlength="64" type="search">
+            <button type="reset" class="search-button"></button>
           </form>
         </header>
+        <div v-for="item in RecommendItems" :key="item.id" class="search-items">
+          <div v-if="RecommendItems.length > 0" class="search-item">
+            {{ item.name }}
+          </div>
+        </div>
+        <div v-if="RecommendItems.length == 0" class="search-items">
+          <div class="search-item">
+            none data
+          </div>
+        </div>
       </div>
     </div>
   </el-container>
@@ -44,6 +50,12 @@ export default {
     return {
       showSearchWindow: false,
       searchValue: '',
+      searchRecommend: [
+        { 'id': 1, 'name': '新增用户', 'link': '/useradd' },
+        { 'id': 2, 'name': '个人信息管理', 'link': '/myinfo' },
+        { 'id': 3, 'name': '个人信息管理', 'link': '/myinfo' },
+        { 'id': 4, 'name': '个人信息管理', 'link': '/myinfo' },
+      ],
     }
   },
   components: {
@@ -68,7 +80,21 @@ export default {
       }
     };
   },
-
+  computed: {
+    RecommendItems () {
+      var _this = this;
+      if (_this.searchValue != null && _this.searchValue != '') {
+        var recommendData = _this.searchRecommend.filter(function (element, index, self) {
+          if (element.name.includes(_this.searchValue)) {
+            return element
+          }
+        })
+        return recommendData
+      } else {
+        return _this.searchRecommend.slice(0, 2);
+      }
+    }
+  }
 }
 </script>
 <style scoped>
@@ -94,12 +120,13 @@ export default {
   margin: 60px auto auto;
   max-width: 560px;
   position: relative;
-  height: 220px;
+  padding-bottom: 5px;
 }
 
 .search-header {
   display: flex;
   padding: 12px 12px 0;
+  margin-bottom: 5px;
 }
 
 .search-form {
@@ -142,9 +169,31 @@ export default {
   stroke-width: 1.4;
   display: flex;
   justify-content: center;
+  touch-action: manipulation;
+  text-transform: none;
 }
 
 .search-button:hover {
   color: #409eff;
+}
+
+.search-items {
+  display: flex;
+  align-items: center;
+  margin: 5px 12px 5px 12px;
+  height: 60px;
+  transition-duration: var(--transition-duration-fast);
+  border-radius: 5px;
+}
+
+.search-items:hover {
+  background-color: var(--el-color-primary);
+  color: #fff;
+}
+
+.search-item {
+  padding: 0 12px 0 12px;
+  display: flex;
+  width: 100%;
 }
 </style>

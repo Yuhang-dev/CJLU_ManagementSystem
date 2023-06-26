@@ -115,7 +115,6 @@ export default {
         return this.totalData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize - 1)
       } else {
         var _this = this
-        console.log(_this.search)
         var searchData = _this.totalData.filter(function (element, index, self) {
           if (element.stuname.includes(_this.search)) {
             return element
