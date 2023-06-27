@@ -25,19 +25,21 @@
       :pager-count="pageCount" layout="sizes, prev, pager, next, jumper" :total="totalRecords"
       style="justify-content: center;margin-top: 10px;" />
   </div>
-  <StuAdd @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
+  <StuAdd @reload="reloadTable()" @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
+  <Detail @closedialog="e => this.showDetail = e" :showForm1="this.showDetail"></Detail>
 </template>
 
 <script>
 import { getStuList } from '@/api/stu'
 import Header from './components/StudentHeader.vue';
 import StuAdd from './components/StudentAdd.vue';
-
+import Detail from './components/StudentDetail.vue';
 
 export default {
   data () {
     return {
       addNewStu: false,
+      showDetail: false,
       currentPage: 1,
       pageSize: 10,
       pageCount: 11,
@@ -49,7 +51,8 @@ export default {
   },
   components: {
     Header,
-    StuAdd
+    StuAdd,
+    Detail,
   },
   created () {
     this.loading = true
@@ -72,11 +75,33 @@ export default {
       })
   },
   methods: {
+    reloadTable () {
+      var _this = this
+      _this.loading = true
+      getStuList()
+        .then((response) => {
+          _this.loading = false
+          _this.totalData = response.data.data
+          ElMessage({
+            type: 'success',
+            message: response.msg
+          })
+        })
+        .catch((error) => {
+          ElMessage({
+            type: 'error',
+            message: response.msg
+          })
+          _this.loading = false
+          console.log(error)
+        })
+    },
     handleSizeChange () {
       console.log(this.pageSize)
     },
     handleEdit (index, row) {
       console.log(index, row)
+      this.showDetail = true;
       // console.log(row.stunum)
     },
     handleDelete (index, row) {

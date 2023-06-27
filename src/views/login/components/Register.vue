@@ -24,7 +24,6 @@
           Create
         </el-button>
         <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
-        <el-button @click="changeVisibility">Hide</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>

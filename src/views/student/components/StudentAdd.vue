@@ -1,5 +1,6 @@
 <template>
-  <el-dialog draggable="true" v-model="dialogFormVisible">
+  <el-dialog v-loading="loading" :before-close="resetForm" draggable="true" v-model="dialogFormVisible"
+    destroy-on-close="true">
     <template #header="titleId">
       <h2 :id="titleId">Add a student</h2>
     </template>
@@ -11,7 +12,8 @@
         <el-input v-model="stuForm.stuname" clearable />
       </el-form-item>
       <el-form-item label="Birthday:" prop="stubirth">
-        <el-date-picker v-model="stuForm.stubirth" type="date" placeholder="Pick a day" />
+        <el-date-picker v-model="stuForm.stubirth" type="date" format="YYYY/MM/DD" value-format="YYYY-MM-DD"
+          placeholder="Pick a day" />
       </el-form-item>
       <el-form-item label="Sex:" prop="stusex">
         <el-radio-group v-model="stuForm.stusex">
@@ -20,14 +22,17 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="Department:" prop="studep">
-        <el-input v-model="stuForm.studep" clearable />
+        <el-select v-model="stuForm.studep">
+          <el-option v-for="item in DropDown" :key="item.depid" :label="item.depname" :value="item.depnum">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="Identification:" prop="stuidentification">
         <el-input v-model="stuForm.stuidentification" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitStuForm()">Create</el-button>
-        <el-button @click="dialogFormVisible = false;">Cancel</el-button>
+        <el-button @click="resetForm()">Reset</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -35,6 +40,12 @@
 
 <script>
 import { ref } from 'vue'
+import { getDepListApi } from '@/api/dep'
+import { addOneStu } from '@/api/stu'
+
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+NProgress.configure({ showSpinner: false });
 
 export default {
   props: {
@@ -51,10 +62,12 @@ export default {
         studep: '',
         stuidentification: '',
       },
+      DropDown: {},
+      loading: false,
       rules: {
         stunum: [
           { required: true, message: 'Please input Activity name', trigger: 'blur' },
-          { min: 1, max: 7, message: 'Length should be 1 to 7', trigger: 'blur' },
+          { min: 7, max: 7, message: 'Length must be 7', trigger: 'blur' },
         ],
         stuname: [
           { required: true, message: 'Please input Activity name', trigger: 'blur' },
@@ -71,20 +84,58 @@ export default {
         ],
         stuidentification: [
           { required: true, message: 'Please input a identification', trigger: 'blur' },
-          { min: 13, max: 13, message: 'Input the valid identification,(13char)', trigger: 'blur' },
+          { min: 18, max: 18, message: 'Input the valid identification,(18char)', trigger: 'blur' },
         ],
       },
     }
   },
   methods: {
     submitStuForm () {
-      this.$refs.stuForm.validate(valid => {
+      var _this = this;
+      _this.$refs.stuForm.validate(valid => {
         if (valid) {
-          alert("submit!");
+          NProgress.start()
+          _this.loading = true
+          var student = {
+            "stunum": _this.stuForm.stunum,
+            "stuname": _this.stuForm.stuname,
+            "stubirth": _this.stuForm.stubirth,
+            "stusex": _this.stuForm.stusex,
+            "studep": _this.stuForm.studep,
+            "stuidentification": _this.stuForm.stuidentification,
+          }
+          addOneStu(student)
+            .then((response) => {
+              ElMessage({
+                type: 'success',
+                message: response.msg
+              })
+              _this.loading = false
+              NProgress.done()
+
+              _this.dialogFormVisible = false
+              _this.$emit('reload')
+            })
+            .catch((error) => {
+              NProgress.done()
+              _this.loading = false
+              console.log(error)
+              ElMessage({
+                type: 'error',
+                message: error.msg
+              })
+            })
         } else {
+          NProgress.done()
+          this.loading = false
           return false;
         }
       });
+    },
+    resetForm (done) {
+      this.$refs.stuForm.resetFields()
+      done()
+
     }
   },
   watch: {
@@ -94,6 +145,22 @@ export default {
     dialogFormVisible () {
       this.$emit('changeVisible', this.dialogFormVisible)
     }
+  },
+  created () {
+    this.loading = true
+    getDepListApi()
+      .then((response) => {
+        this.DropDown = response.data.data
+        this.loading = false
+      })
+      .catch((error) => {
+        ElMessage({
+          type: 'error',
+          message: response.msg
+        })
+        this.loading = false
+        console.log(error)
+      })
   }
 }
 </script>
