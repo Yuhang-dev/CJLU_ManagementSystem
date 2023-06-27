@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, watch, toRefs } from 'vue';
+import { reactive, ref, watch, toRefs, onMounted } from 'vue';
 
 const props = defineProps(['stuid', 'showForm1']);
 const { stuid } = toRefs(props);
@@ -60,8 +60,12 @@ interface STUDENT {
   stuidentification: string
 }
 
+// onMounted(() => {
+//   editForm.stuid = stuid.value;
+// })
+
 const editForm = reactive<STUDENT>({
-  stuid: '',
+  stuid: '1111',
   stunum: '',
   stuname: '',
   stusex: '',
@@ -116,6 +120,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
 }
+
 
 
 </script>

@@ -25,15 +25,16 @@
       :pager-count="pageCount" layout="sizes, prev, pager, next, jumper" :total="totalRecords"
       style="justify-content: center;margin-top: 10px;" />
   </div>
-  <StuAdd @reload="reloadTable()" @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
-  <Detail @closedialog="e => this.showDetail = e" :showForm1="this.showDetail"></Detail>
+  <StuAdd @reload="reloadTable(1)" @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
+  <Detail @closedialog="e => this.showDetail = e" :showForm1="this.showDetail" :stuid="this.detailStuId"></Detail>
 </template>
 
 <script>
-import { getStuList } from '@/api/stu'
+import { getStuList, queryCountApi } from '@/api/stu'
 import Header from './components/StudentHeader.vue';
 import StuAdd from './components/StudentAdd.vue';
 import Detail from './components/StudentDetail.vue';
+import { ElMessage } from 'element-plus';
 
 export default {
   data () {
@@ -47,6 +48,10 @@ export default {
       tableWidth: 0,
       loading: false,
       search: '',
+      databaseTotal: 0,
+      oneQueryAmount: 100,
+      currentDatabasePage: 1,
+      detailStuId: '',
     }
   },
   components: {
@@ -56,10 +61,10 @@ export default {
   },
   created () {
     this.loading = true
-    getStuList()
+    getStuList(1)
       .then((response) => {
         this.loading = false
-        this.totalData = response.data.data
+        this.totalData = response.data
         ElMessage({
           type: 'success',
           message: response.msg
@@ -73,15 +78,27 @@ export default {
         this.loading = false
         console.log(error)
       })
+
+    queryCountApi()
+      .then((response) => {
+        this.databaseTotal = response.data
+      })
+      .catch((error) => {
+        console.log(error)
+        ElMessage({
+          type: 'error',
+          message: '无法连接数据库',
+        })
+      })
   },
   methods: {
-    reloadTable () {
+    reloadTable (n) {
       var _this = this
       _this.loading = true
-      getStuList()
+      getStuList(n)
         .then((response) => {
           _this.loading = false
-          _this.totalData = response.data.data
+          _this.totalData = response.data
           ElMessage({
             type: 'success',
             message: response.msg
@@ -103,6 +120,7 @@ export default {
       console.log(index, row)
       this.showDetail = true;
       // console.log(row.stunum)
+      this.$emit('stuid', row.stuid)
     },
     handleDelete (index, row) {
       ElMessageBox.confirm(
@@ -138,15 +156,29 @@ export default {
           })
         })
     },
-
+  },
+  watch: {
+    currentPage () {
+      var _this = this
+      console.log(_this.currentPage)
+      if (_this.currentPage * _this.pageSize < (_this.currentDatabasePage - 1) * _this.oneQueryAmount) {
+        _this.currentDatabasePage = Math.floor((_this.currentPage * _this.pageSize / 100) + 1)
+        _this.reloadTable(_this.currentDatabasePage)
+      }
+      else if (_this.currentPage * _this.pageSize > _this.currentDatabasePage * _this.oneQueryAmount) {
+        _this.currentDatabasePage = Math.floor((_this.currentPage * _this.pageSize / 100) + 1)
+        _this.reloadTable(_this.currentDatabasePage)
+      }
+    }
   },
   computed: {
     totalRecords () {
-      return this.totalData.length
+      return this.databaseTotal
     },
     currentTableData () {
       if (this.search == null || this.search.length == 0 || this.search === '') {
-        return this.totalData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize - 1)
+        return this.totalData.slice((this.currentPage - 1) * this.pageSize - (this.currentDatabasePage - 1) * this.oneQueryAmount,
+          this.currentPage * this.pageSize - 1 - (this.currentDatabasePage - 1) * this.oneQueryAmount)
       } else {
         var _this = this
         var searchData = _this.totalData.filter(function (element, index, self) {
