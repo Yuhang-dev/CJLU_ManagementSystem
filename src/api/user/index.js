@@ -16,11 +16,11 @@ export function getUserInfo () {
  *
  * @param data
  */
-export function addUser (data) {
+export function addOneUserApi (data) {
   return request({
-    url: '/api/v1/users',
+    url: '/user/addOneUser',
     method: 'post',
-    data: { data }
+    data: data
   });
 }
 

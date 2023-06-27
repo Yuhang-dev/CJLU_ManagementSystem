@@ -18,7 +18,9 @@
     </div>
     <div class="side-background"></div>
   </div>
-  <RegisterView @closedialog="e => this.dialogFormVisible = e" :showForm="this.dialogFormVisible"></RegisterView>
+  <RegisterView @registerSuccess="handleregisterSuccess" @closedialog="e => this.dialogFormVisible = e"
+    :showForm="this.dialogFormVisible">
+  </RegisterView>
 </template>
 
 <script>
@@ -94,6 +96,10 @@ export default {
             });
         }
       }
+    },
+    handleregisterSuccess (data) {
+      this.loginForm.username = data.user.username;
+      this.loginForm.password = data.user.password;
     },
     login () {
       var _this = this;
