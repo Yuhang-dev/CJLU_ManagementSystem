@@ -26,11 +26,12 @@
       style="justify-content: center;margin-top: 10px;" />
   </div>
   <StuAdd @reload="reloadTable(1)" @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
-  <Detail @closedialog="e => this.showDetail = e" :showForm1="this.showDetail" :stuid="this.detailStuId"></Detail>
+  <Detail @RefreshTable="() => reloadTable(1)" @closedialog="e => this.showDetail = e" :showForm1="this.showDetail"
+    v-bind="this.detailStudent"></Detail>
 </template>
 
 <script>
-import { getStuList, queryCountApi } from '@/api/stu'
+import { getStuList, queryCountApi, deleteStudent } from '@/api/stu'
 import Header from './components/StudentHeader.vue';
 import StuAdd from './components/StudentAdd.vue';
 import Detail from './components/StudentDetail.vue';
@@ -51,7 +52,7 @@ export default {
       databaseTotal: 0,
       oneQueryAmount: 100,
       currentDatabasePage: 1,
-      detailStuId: '',
+      detailStudent: {},
     }
   },
   components: {
@@ -101,7 +102,7 @@ export default {
           _this.totalData = response.data
           ElMessage({
             type: 'success',
-            message: response.msg
+            message: '表格更新'
           })
         })
         .catch((error) => {
@@ -120,7 +121,16 @@ export default {
       console.log(index, row)
       this.showDetail = true;
       // console.log(row.stunum)
-      this.$emit('stuid', row.stuid)
+      this.detailStudent =
+      {
+        "stuid": row.stuid,
+        "stunum": row.stunum,
+        "stuname": row.stuname,
+        "stusex": row.stusex,
+        "studep": row.studep,
+        "stubirth": row.stubirth,
+        "stuidentification": row.stuidentification,
+      }
     },
     handleDelete (index, row) {
       ElMessageBox.confirm(
@@ -137,15 +147,17 @@ export default {
         },
       )
         .then(() => {
-          axios.delete('https://mock.presstime.cn/mock/64925b923acfaff9262afadc/studentlist/getstulist')
-            .then((response) => {
 
+          deleteStudent(row.stuid)
+            .then((response) => {
+              ElMessage({
+                type: 'success',
+                message: 'Delete success.'
+              })
+              reloadTable(1)
             })
-          ElMessage({
-            type: 'success',
-            message: 'Delete success.'
-          })
         })
+
         .catch((action) => {
           ElMessage({
             type: 'info',

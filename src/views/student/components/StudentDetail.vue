@@ -28,7 +28,7 @@
         <el-input v-model="editForm.stuidentification" />
       </el-form-item>
       <el-form-item>
-        <el-button v-loading="loading" type="primary" @click="">
+        <el-button v-loading="loading" type="primary" @click="update()">
           Update
         </el-button>
         <el-button @click="resetForm(ruleFormRef); changeVisibility()">Cancel</el-button>
@@ -39,12 +39,12 @@
 
 <script lang="ts" setup>
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, watch, toRefs, onMounted } from 'vue';
+import { reactive, ref, watch, toRefs, onUpdated } from 'vue';
+import { updateStudent } from '@/api/stu';
 
-const props = defineProps(['stuid', 'showForm1']);
-const { stuid } = toRefs(props);
-const { showForm1 } = toRefs(props)
-const emit = defineEmits(['closedialog'])
+const props = defineProps(['showForm1', 'stuid', 'stunum', 'stuname', 'stusex', 'studep', 'stubirth', 'stuidentification']);
+const { showForm1, stuid, stunum, stuname, stusex, studep, stubirth, stuidentification } = toRefs(props)
+const emit = defineEmits(['closedialog', 'RefreshTable'])
 const loading = ref<Boolean>(false);
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
@@ -60,12 +60,21 @@ interface STUDENT {
   stuidentification: string
 }
 
-// onMounted(() => {
-//   editForm.stuid = stuid.value;
-// })
+onUpdated(() => {
+  editForm.stuid = stuid.value;
+  editForm.stunum = stunum.value;
+  editForm.stuname = stuname.value;
+  if (stusex.value === 0 || stusex.value === '0')
+    editForm.stusex = 'Women';
+  else
+    editForm.stusex = 'Man';
+  editForm.studep = studep.value;
+  editForm.stubirth = stubirth.value;
+  editForm.stuidentification = stuidentification.value;
+})
 
 const editForm = reactive<STUDENT>({
-  stuid: '1111',
+  stuid: '',
   stunum: '',
   stuname: '',
   stusex: '',
@@ -73,6 +82,7 @@ const editForm = reactive<STUDENT>({
   stubirth: '',
   stuidentification: '',
 })
+
 
 const rules = reactive<FormRules<STUDENT>>({
   stunum: [
@@ -103,6 +113,47 @@ watch(visible, () => {
 const changeVisibility = () => {
   visible.value = false;
 }
+
+const update = function () {
+  const student = {
+    "stuid": editForm.stuid,
+    "stunum": editForm.stunum,
+    "stuname": editForm.stuname,
+    "stusex": editForm.stusex,
+    "studep": editForm.studep,
+    "stubirth": editForm.stubirth,
+    "stuidentification": editForm.stuidentification,
+  }
+  if (editForm.stusex !== 'Women' || editForm.stusex != 'Women')
+    student.stusex = '1';
+  else
+    student.stusex = '0';
+  updateStudent(student)
+    .then((response) => {
+      editForm.stuid = response.data.stuid;
+      editForm.stunum = response.data.stunum;
+      editForm.stuname = response.data.stuname;
+      if (response.data.stusex === 0 || response.data.stusex === '0')
+        editForm.stusex = 'Women';
+      else
+        editForm.stusex = 'Man';
+      editForm.studep = response.data.studep;
+      editForm.stubirth = response.data.stubirth;
+      editForm.stuidentification = response.data.stuidentification;
+      ElMessage({
+        type: 'success',
+        message: 'Successful'
+      })
+      emit('RefreshTable')
+    })
+    .catch((error) => {
+      ElMessage({
+        type: 'error',
+        message: error.msg || '更新失败'
+      })
+    })
+}
+
 
 const beforeCLOSE = function (done) {
   editForm.stuid = ''
