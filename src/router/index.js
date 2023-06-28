@@ -35,10 +35,6 @@ const router = createRouter({
           component: () => import('@/views/usermanage/index.vue')
         },
         {
-          path: 'test',
-          component: () => import('@/views/test/index.vue')
-        },
-        {
           path: "401",
           component: () => import("@/views/error-page/401.vue"),
           meta: { hidden: true },
