@@ -1,6 +1,18 @@
 import request from '@/utils/request';
 
 /**
+ * 学生模糊查询
+ *
+ * @param data
+ */
+export function fuzzyQuery (data) {
+  return request({
+    url: '/student/fuzzyquery/',
+    method: 'post',
+    data: data,
+  });
+}
+/**
  * 学生信息删除
  *
  * @param id
@@ -52,7 +64,7 @@ export function getStuList (page) {
 }
 
 /**
- * 具体学生查询
+ * 学生添加
  *
  * @param 
  */
@@ -61,17 +73,5 @@ export function addOneStu (data) {
     url: '/student/addOneStu',
     method: 'post',
     data: data,
-  });
-}
-
-/**
- * 具体学生查询
- *
- * @param 
- */
-export function queryOneStu (param) {
-  return request({
-    url: '/student/queryOneStu',
-    method: 'get'
   });
 }

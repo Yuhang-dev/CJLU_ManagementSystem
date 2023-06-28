@@ -1,6 +1,8 @@
 <template>
   <div style="margin: 5px 0 5px 0;">
-    <Header @newStudent="this.addNewStu = true;"></Header>
+    <Header @resetquery="() => this.resetFuzzyQuery()" @fuzzyquery="e => fuzzyquery(e)"
+      @newStudent="this.addNewStu = true;">
+    </Header>
   </div>
   <div class="table-wrapper">
     <el-table max-height="550" v-loading="loading" id="studiv" element-loading-text="Loading..." :border="true"
@@ -21,9 +23,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination v-model:page-size="pageSize" v-model:current-page="currentPage" :page-sizes="[10, 20, 50, 5]"
-      :pager-count="pageCount" layout="sizes, prev, pager, next, jumper" :total="totalRecords"
-      style="justify-content: center;margin-top: 10px;" />
+    <el-pagination v-model:page-size="pageSize" v-model:current-page="currentPage" :page-sizes="[5, 10, 20, 50]"
+      :pager-count="pageCount" layout="sizes, prev, pager, next, jumper"
+      :total="isFuzzyQuery ? totalFuzzyRecords : totalRecords" style="justify-content: center;margin-top: 10px;" />
   </div>
   <StuAdd @reload="reloadTable(1)" @changeVisible="e => this.addNewStu = e" :showForm=this.addNewStu></StuAdd>
   <Detail @RefreshTable="() => reloadTable(1)" @closedialog="e => this.showDetail = e" :showForm1="this.showDetail"
@@ -31,7 +33,7 @@
 </template>
 
 <script>
-import { getStuList, queryCountApi, deleteStudent } from '@/api/stu'
+import { getStuList, queryCountApi, deleteStudent, fuzzyQuery } from '@/api/stu';
 import Header from './components/StudentHeader.vue';
 import StuAdd from './components/StudentAdd.vue';
 import Detail from './components/StudentDetail.vue';
@@ -53,6 +55,8 @@ export default {
       oneQueryAmount: 100,
       currentDatabasePage: 1,
       detailStudent: {},
+      fuzzyQueryData: [],
+      isFuzzyQuery: false,
     }
   },
   components: {
@@ -93,6 +97,23 @@ export default {
       })
   },
   methods: {
+    resetFuzzyQuery () {
+      this.isFuzzyQuery = false;
+      this.fuzzyQueryData = [];
+      this.currentPage = 1;
+    },
+    fuzzyquery (stu) {
+      var _this = this
+      _this.currentPage = 1
+      fuzzyQuery(stu)
+        .then((response) => {
+          _this.isFuzzyQuery = true
+          _this.fuzzyQueryData = response.data.data
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     reloadTable (n) {
       var _this = this
       _this.loading = true
@@ -172,33 +193,53 @@ export default {
   watch: {
     currentPage () {
       var _this = this
-      console.log(_this.currentPage)
-      if (_this.currentPage * _this.pageSize < (_this.currentDatabasePage - 1) * _this.oneQueryAmount) {
-        _this.currentDatabasePage = Math.floor((_this.currentPage * _this.pageSize / 100) + 1)
-        _this.reloadTable(_this.currentDatabasePage)
-      }
-      else if (_this.currentPage * _this.pageSize > _this.currentDatabasePage * _this.oneQueryAmount) {
-        _this.currentDatabasePage = Math.floor((_this.currentPage * _this.pageSize / 100) + 1)
-        _this.reloadTable(_this.currentDatabasePage)
+      if (_this.isFuzzyQuery) {
+
+      } else {
+        if (_this.currentPage * _this.pageSize < (_this.currentDatabasePage - 1) * _this.oneQueryAmount) {
+          _this.currentDatabasePage = Math.floor((_this.currentPage * _this.pageSize / 100) + 1)
+          _this.reloadTable(_this.currentDatabasePage)
+        }
+        else if (_this.currentPage * _this.pageSize > _this.currentDatabasePage * _this.oneQueryAmount) {
+          _this.currentDatabasePage = Math.floor((_this.currentPage * _this.pageSize / 100) + 1)
+          _this.reloadTable(_this.currentDatabasePage)
+        }
       }
     }
   },
   computed: {
+    totalFuzzyRecords () {
+      return this.fuzzyQueryData.length
+    },
     totalRecords () {
       return this.databaseTotal
     },
     currentTableData () {
-      if (this.search == null || this.search.length == 0 || this.search === '') {
-        return this.totalData.slice((this.currentPage - 1) * this.pageSize - (this.currentDatabasePage - 1) * this.oneQueryAmount,
-          this.currentPage * this.pageSize - 1 - (this.currentDatabasePage - 1) * this.oneQueryAmount)
+      if (this.isFuzzyQuery) {
+        if (this.search == null || this.search.length == 0 || this.search === '') {
+          return this.fuzzyQueryData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize - 1)
+        } else {
+          var _this = this
+          var searchData = _this.fuzzyQueryData.filter(function (element, index, self) {
+            if (element.stuname.includes(_this.search)) {
+              return element
+            }
+          })
+          return searchData
+        }
       } else {
-        var _this = this
-        var searchData = _this.totalData.filter(function (element, index, self) {
-          if (element.stuname.includes(_this.search)) {
-            return element
-          }
-        })
-        return searchData
+        if (this.search == null || this.search.length == 0 || this.search === '') {
+          return this.totalData.slice((this.currentPage - 1) * this.pageSize - (this.currentDatabasePage - 1) * this.oneQueryAmount,
+            this.currentPage * this.pageSize - 1 - (this.currentDatabasePage - 1) * this.oneQueryAmount)
+        } else {
+          var _this = this
+          var searchData = _this.totalData.filter(function (element, index, self) {
+            if (element.stuname.includes(_this.search)) {
+              return element
+            }
+          })
+          return searchData
+        }
       }
     },
   },
