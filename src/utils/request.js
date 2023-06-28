@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { useUserStoreHook } from '../store/modules/user';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage } from 'element-plus';
+
 
 // 创建 axios 实例
 const service = axios.create({
-  baseURL: "http://localhost:8099",
+  baseURL: import.meta.env.VITE_APP_BASE_API,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json;charset=utf-8' }
 });
