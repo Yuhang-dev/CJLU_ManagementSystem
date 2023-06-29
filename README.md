@@ -1,4 +1,4 @@
-# cjlu_managementsys
+# [cjlu_managementsys](https://github.com/Yuhang-dev/CJLU_ManagementSystem)
 
 A management system by Vue3 + pinia + vite + [element-plus](https://element-plus.org/), Some functionality was modified from [vue-element-admin](https://panjiachen.github.io/vue-element-admin-site/zh/), based on js.
 
