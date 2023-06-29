@@ -60,7 +60,6 @@ export const useUserStore = defineStore("user", () => {
         .then(() => {
           resetRouter();
           resetToken();
-          location.reload(); // 清空路由
           resolve();
         })
         .catch((error) => {
